@@ -1,3 +1,4 @@
+import secrets
 from . import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -39,8 +40,7 @@ class User(db.Model):
             "email": self.email,
             "dateCreated": self.date_created
         }
-    
-    class Task(db.Model):
+class Task(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         title = db.Column(db.String, nullable=False)
         description = db.Column(db.String, nullable=False)
@@ -76,6 +76,5 @@ class User(db.Model):
                 "completed": self.completed,
                 "created_at": self.created_at,
                 "due_date": self.due_date
-
             }
         

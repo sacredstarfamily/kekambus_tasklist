@@ -2,7 +2,8 @@ from flask import jsonify, abort, render_template, request
 
 from . import app, db
 from data.tasklist import tasks_list
-from .models import User, Task
+from .models import User
+from .models import Task
 @app.route('/')
 def index():
     return render_template('index.html')
