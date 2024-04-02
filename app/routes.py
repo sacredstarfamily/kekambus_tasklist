@@ -4,6 +4,8 @@ from . import app, db
 from data.tasklist import tasks_list
 from .models import User
 from .models import Task
+from .auth import basic_auth, token_auth
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -42,6 +44,12 @@ def create_user():
 
     return new_user.to_dict(), 201
 
+@app.route('/token')
+@basic_auth.login_required
+def get_token():
+    user = basic_auth.current_user()
+    return user.get_token()
+
 @app.route('/tasks')
 def get_all_tasks():
     select_stmt = db.select(Task)
@@ -60,6 +68,7 @@ def get_task_by_id(task_id):
     else:
         return {'error': f"Post with an ID of {task_id} does not exist"}, 404
 @app.route('/tasks', methods=['POST'])
+@token_auth.login_required
 def create_task(): 
    
     if not request.is_json:
@@ -79,10 +88,36 @@ def create_task():
 
     title = data.get('title')
     description = data.get('description')
-
+    current_user = token_auth.current_user()
     
-    new_task = Task(title=title, description=description)
+    new_task = Task(title=title, description=description, user_id=current_user.id)
 
     return new_task.to_dict(), 201
 
+@app.route('/tasks/<int:task_id>', methods=['PUT'])
+@token_auth.login_required
+def edit_task(task_id):
+    if not request.is_json:
+        return {'error': 'Your content type must be application/json'}, 400
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return {'error': f"task with ID #{task_id} does not exist"}, 404
+    create_user = token_auth.current_user()
+    if create_user is not task.author:
+        return {'error': "this is not your task to edit"}, 403
+    data = request.json
+    task.update(**data)
+    return task.to_dict()
 
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+@token_auth.login_required
+def delete_task(task_id):
+    task = db.session.get(Task, task_id)
+    if task is None:
+        return {'error': f"No Task with id #{task_id}"}, 404
+    create_user = token_auth.current_user()
+    if task.author != create_user:
+        return {'error': 'you dont have permision to delete this task'}, 403
+    task.delete()
+    return {'success': 'task deleted'}, 200
+    
