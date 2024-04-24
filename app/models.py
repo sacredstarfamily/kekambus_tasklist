@@ -12,7 +12,7 @@ class User(db.Model):
     username = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
-    tasks = db.relationship('Task', back_populates='author')
+    tasks = db.relationship('Task', back_populates='author', cascade='all, delete')
     token = db.Column(db.String, index=True, unique=True)
     token_expiration = db.Column(db.DateTime(timezone=True))
 
@@ -39,8 +39,6 @@ class User(db.Model):
         self.save()
         
     def delete(self):
-        db.session.delete(self.tasks)
-        db.session.commit()
         db.session.delete(self)
         db.session.commit()
         
