@@ -31,6 +31,17 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def update(self, **kwargs):
+        allowed_fields = {'username', 'first_name', 'last_name', 'email', 'password'}
+        for attr, value in kwargs.items():
+            if attr in allowed_fields:
+                setattr(self, attr, value)
+        self.save()
+        
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        
     def check_password(self, plaintext_password):
         return check_password_hash(self.password, plaintext_password)
     
