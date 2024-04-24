@@ -67,7 +67,7 @@ def update_user():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-    update_data = {first_name, last_name, username, email, password}
+    update_data = {"first_name": first_name, "last_name": last_name, "username": username, "email": email, "password": password}
     current_user = token_auth.current_user()
     user = db.session.get(User, current_user.id)
     current_user.update(update_data)
