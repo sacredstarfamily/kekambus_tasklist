@@ -62,7 +62,7 @@ def update_user():
     data = request.json
     current_user = token_auth.current_user()
     user = db.session.get(User, current_user.id)
-    user.update(**data)
+   
     return current_user.to_dict()
 
 @app.route('/users', methods=['DELETE'])
