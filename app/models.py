@@ -39,6 +39,8 @@ class User(db.Model):
         self.save()
         
     def delete(self):
+        db.session.delete(self.tasks)
+        db.session.commit()
         db.session.delete(self)
         db.session.commit()
         
