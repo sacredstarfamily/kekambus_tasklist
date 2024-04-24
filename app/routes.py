@@ -61,9 +61,16 @@ def update_user():
     if not request.is_json:
         return {'error': 'Your content-type must be application/json'}, 400
     data = request.json
+    allowed_fields = ['firstName', 'lastName', 'username', 'email', 'password']
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
+    update_data = {first_name, last_name, username, email, password}
     current_user = token_auth.current_user()
     user = db.session.get(User, current_user.id)
-    current_user.update(**data)
+    current_user.update(update_data)
     return current_user.to_dict()
 
 @app.route('/users', methods=['DELETE'])
