@@ -70,10 +70,9 @@ def update_user():
 @token_auth.login_required
 def delete_user():
     current_user = token_auth.current_user()
-    user = db.session.get(User, current_user.id)
-    if user:
-        user.delete()
-        return {'success': 'user deleted'}, 200
+    
+    current_user.delete()
+    return {'success': 'user deleted'}, 200
    
 
 @app.route('/tasks')
