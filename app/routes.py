@@ -54,6 +54,17 @@ def get_token():
 def get_me():
     user = token_auth.current_user()
     return user.to_dict()
+@app.route('/users', methods=['PUT'])
+@token_auth.login_required
+def update_user():
+    if not request.is_json:
+        return {'error': 'Your content-type must be application/json'}, 400
+    data = request.json
+    current_user = token_auth.current_user()
+    user = db.session.get(User, current_user.id)
+    user.update(**data)
+    return current_user.to_dict()
+
 @app.route('/users', methods=['DELETE'])
 @token_auth.login_required
 def delete_user():
